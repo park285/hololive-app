@@ -174,8 +174,6 @@ health.json
 
 
 # 프로젝트 설정 파일
-!.agent/
-!.agent/**
 !Makefile
 
 # 공개 에셋
