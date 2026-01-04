@@ -12,6 +12,9 @@
 .env.local
 .env.development
 .env.production
+# 문서 파일 (README.md 제외)
+*.md
+!README.md
 src-tauri/.env
 
 # 인증 관련
@@ -168,15 +171,12 @@ health.json
 # ============================================
 # 명시적 포함 (무시하지 않음)
 # ============================================
-# 문서 폴더 (중요!)
-!docs/
-!docs/**
+
 
 # 프로젝트 설정 파일
 !.agent/
 !.agent/**
 !Makefile
-!NOTICE.md
 
 # 공개 에셋
 !public/
