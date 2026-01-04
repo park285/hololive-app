@@ -85,11 +85,11 @@ src-tauri/clippy_output.txt
 # ============================================
 # IDE / 에디터
 # ============================================
-# VS Code (설정은 유지, 히스토리/캐시는 제외)
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-!.vscode/launch.json
+# VS Code (전체 제외)
+.vscode/
+
+# keys 폴더 (보안)
+keys/
 
 # JetBrains (IntelliJ, RustRover 등)
 .idea/
