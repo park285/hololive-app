@@ -1,0 +1,37 @@
+# ============================================
+# Tauri/Rust Backend - .gitignore
+# ============================================
+
+# 보안 - 환경 변수 (API 키, OAuth 시크릿 등)
+.env
+.env.*
+
+# Cargo 빌드 출력
+/target/
+
+# Tauri 자동 생성 파일 (스키마)
+/gen/schemas/
+
+# Android 빌드 캐시 및 로컬 설정
+/gen/android/.gradle/
+/gen/android/app/build/
+/gen/android/build/
+/gen/android/local.properties
+/gen/android/.idea/
+/gen/android/*.iml
+/gen/android/app/*.iml
+
+# iOS 빌드 (향후 대비)
+/gen/apple/build/
+*.xcworkspace/
+*.xcuserdata/
+
+# Clippy 출력 로그
+clippy_output.txt
+
+# 서명 키 파일
+*.keystore
+*.jks
+*.pem
+*.key
+*.p12

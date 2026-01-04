@@ -1,0 +1,44 @@
+# Clippy 설정 (Strict Mode)
+# https://doc.rust-lang.org/clippy/configuration.html
+
+# Rust 1.91.1 stable (2025-11-10)
+msrv = "1.91.1"
+
+# Wildcard imports 경고 활성화
+warn-on-all-wildcard-imports = true
+
+# 복잡도 임계값 (Clippy 기본: 25, Tauri 앱 특성상 약간 여유 부여)
+cognitive-complexity-threshold = 20
+
+# 함수 길이 및 인자 수 제한
+too-many-lines-threshold = 80
+too-many-arguments-threshold = 5
+
+# 타입 복잡도 (async/Future chains 고려)
+type-complexity-threshold = 250
+
+# Enum variant naming threshold
+enum-variant-name-threshold = 3
+
+# 문서 주석에서 허용되는 CamelCase 식별자
+doc-valid-idents = [
+    "TypeScript",
+    "JavaScript",
+    "GraphQL",
+    "WebSocket",
+    "SQLite",
+    "JSON",
+    "API",
+    "URL",
+    "HTTP",
+    "HTTPS",
+    "UUID",
+    "Holodex",
+    "YouTube",
+    "Tauri",
+    "macOS",
+    "iOS"
+]
+
+# 금지된 변수명 (placeholder 방지)
+disallowed-names = ["foo", "bar", "baz", "quux", "temp", "tmp", "data", "result"]

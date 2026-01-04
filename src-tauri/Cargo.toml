@@ -1,0 +1,93 @@
+[package]
+name = "hololive-notifier"
+version = "0.1.0"
+description = "Hololive Stream Notification Desktop App"
+authors = ["kapu"]
+edition = "2021"
+rust-version = "1.91.1"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "hololive_notifier_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-http = "2"
+tauri-plugin-store = "2"
+rusqlite = { version = "0.32", features = ["bundled", "chrono"] }
+oauth2 = { version = "5", default-features = false, features = ["rustls-tls"] }
+url = "2"
+rand = "0.8"
+base64 = "0.22"
+sha2 = "0.10"
+urlencoding = "2"
+dotenvy = "0.15"
+parking_lot = "0.12"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+tokio = { version = "1", features = ["rt-multi-thread", "time", "sync", "macros"] }
+chrono = { version = "0.4", default-features = false, features = ["std", "clock", "serde"] }
+thiserror = "2"
+tracing = "0.1"
+futures = "0.3"
+tauri-plugin-dialog = "2.4.2"
+tauri-plugin-deep-link = "2"
+
+# Desktop-only dependencies (rodio uses cpal which doesn't support Android)
+[target.'cfg(not(target_os = "android"))'.dependencies]
+rodio = "0.21.1"
+
+# Windows-only dependencies for toast notification with click callback
+[target.'cfg(target_os = "windows")'.dependencies]
+winrt-toast-reborn = "0.3"
+open = "5"
+
+[dev-dependencies]
+httpmock = "0.7"
+
+# Clippy & Rustc Lint 설정
+[lints.rust]
+unsafe_code = "warn"
+missing_docs = "allow"
+
+[lints.clippy]
+# Clippy 그룹 설정
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+
+# Pedantic에서 과도한 lint들은 허용
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+too_many_lines = "allow"
+
+# 프로젝트 스타일 (명시적)
+clone_on_ref_ptr = "warn"
+dbg_macro = "warn"
+print_stdout = "warn"
+print_stderr = "warn"
+todo = "warn"
+unimplemented = "warn"
+unwrap_used = "warn"
+expect_used = "warn"
+
+# Dev build optimization (faster debug builds)
+[profile.dev]
+opt-level = 1          # Slight optimization for better dev experience
+
+# Release build optimization
+[profile.release]
+opt-level = 3          # Maximum performance optimization
+lto = true             # Link-Time Optimization (significant binary size reduction)
+codegen-units = 1      # Single codegen unit (better optimization, slower build)
+panic = "abort"        # Abort on panic (smaller binary, no unwinding)
+strip = true           # Strip debug symbols
