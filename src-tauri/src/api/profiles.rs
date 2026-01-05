@@ -125,12 +125,12 @@ mod tests {
                       "status": "ok",
                       "profile": {
                         "slug": "sakura-miko",
-                        "english_name": "Sakura Miko",
-                        "japanese_name": "さくらみこ",
+                        "englishName": "Sakura Miko",
+                        "japaneseName": "さくらみこ",
                         "catchphrase": "Elite Miko!"
                       },
                       "translated": {
-                        "display_name": "사쿠라 미코",
+                        "displayName": "사쿠라 미코",
                         "catchphrase": "엘리트 미코!"
                       }
                     }"#,

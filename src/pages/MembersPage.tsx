@@ -83,15 +83,15 @@ export default function MembersPage() {
                     </div>
                 </div>
             ) : isLoadingMembers ? (
-                <div className="space-y-4">
-                    <div className="text-center text-muted-foreground animate-pulse">
-                        {t('common.loadingMembers')}
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {[...Array(10)].map((_, i) => (
-                            <div key={i} className="h-40 rounded-xl bg-muted/50 animate-pulse" />
-                        ))}
-                    </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {[...Array(10)].map((_, i) => (
+                        <div key={i} className="flex flex-col items-center p-4 rounded-xl border bg-card animate-pulse">
+                            <div className="w-20 h-20 rounded-full bg-muted mb-3" />
+                            <div className="h-4 bg-muted rounded w-3/4 mb-2" />
+                            <div className="h-3 bg-muted rounded w-1/2 mb-4" />
+                            <div className="h-8 bg-muted rounded-full w-24" />
+                        </div>
+                    ))}
                 </div>
             ) : members.length > 0 ? (
                 <div
@@ -110,6 +110,7 @@ export default function MembersPage() {
                                     member={member}
                                     isAlarmEnabled={isAlarmEnabled}
                                     onToggleAlarm={handleToggleAlarm}
+                                    priority={index < 5}
                                 />
                             </div>
                         );

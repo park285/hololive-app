@@ -1,6 +1,9 @@
-// Google OAuth 2.0 인증 모듈
-// PKCE (Proof Key for Code Exchange) 기반 안전한 인증 흐름 구현
-// 데스크톱 앱용 로컬 HTTP 서버 방식 사용
+// 인증 모듈
+// - Google OAuth 2.0 (PKCE 기반) - 레거시
+// - Session-based 인증 (api.capu.blog) - 신규
+
+pub mod storage;
+pub mod types;
 
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use rand::Rng;

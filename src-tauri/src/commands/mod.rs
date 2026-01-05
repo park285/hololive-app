@@ -6,6 +6,8 @@ pub mod auth;
 pub mod channels;
 pub mod history;
 pub mod members;
+pub mod multiview;
+pub mod session_auth;
 pub mod settings;
 pub mod streams;
 
@@ -14,5 +16,7 @@ pub use auth::*;
 pub use channels::*;
 pub use history::*;
 pub use members::*;
+pub use multiview::*;
+pub use session_auth::*;
 pub use settings::*;
 pub use streams::*;

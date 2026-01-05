@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hololive App - Authenticating</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ====================================
+           Light Theme Colors (Default)
+           ==================================== */
+        :root {
+            --background: 210 40% 98%;
+            /* #f8fafc */
+            --foreground: 222 47% 11%;
+            /* #0f172a */
+            --card: 0 0% 100%;
+            /* #ffffff */
+            --card-foreground: 222 47% 11%;
+            --primary: 221 83% 53%;
+            /* #3b82f6 - Blue */
+            --primary-foreground: 210 40% 98%;
+            /* #f8fafc */
+            --muted: 210 40% 96.1%;
+            /* #f1f5f9 */
+            --muted-foreground: 215.4 16.3% 46.9%;
+            /* #64748b */
+            --border: 214.3 31.8% 91.4%;
+            /* #e2e8f0 */
+            --destructive: 0 84.2% 60.2%;
+            /* #ef4444 */
+            --radius: 1rem;
+
+            /* Gradient accents */
+            --gradient-accent-1: rgba(59, 130, 246, 0.08);
+            /* Blue */
+            --gradient-accent-2: rgba(168, 85, 247, 0.06);
+            /* Purple */
+        }
+
+        /* ====================================
+           Dark Theme Colors
+           ==================================== */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: 222.2 84% 4.9%;
+                /* #020817 */
+                --foreground: 210 40% 98%;
+                /* #f8fafc */
+                --card: 222.2 84% 4.9%;
+                --card-foreground: 210 40% 98%;
+                --primary: 210 40% 98%;
+                /* #f8fafc */
+                --primary-foreground: 222.2 47.4% 11.2%;
+                /* #0f172a */
+                --muted: 217.2 32.6% 17.5%;
+                /* #1e293b */
+                --muted-foreground: 215 20.2% 65.1%;
+                /* #94a3b8 */
+                --border: 217.2 32.6% 17.5%;
+                --destructive: 0 62.8% 30.6%;
+
+                /* Gradient accents for dark */
+                --gradient-accent-1: rgba(56, 189, 248, 0.08);
+                /* Cyan */
+                --gradient-accent-2: rgba(168, 85, 247, 0.08);
+                /* Purple */
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            background-image:
+                radial-gradient(circle at 15% 50%, var(--gradient-accent-1), transparent 25%),
+                radial-gradient(circle at 85% 30%, var(--gradient-accent-2), transparent 25%);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card {
+            background-color: hsl(var(--card) / 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .card {
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        .icon-wrapper {
+            width: 64px;
+            height: 64px;
+            background-color: hsl(var(--muted));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            position: relative;
+        }
+
+        .icon-wrapper svg {
+            width: 32px;
+            height: 32px;
+            color: hsl(var(--primary));
+            z-index: 2;
+        }
+
+        @media (prefers-color-scheme: light) {
+            .icon-wrapper svg {
+                color: hsl(221 83% 53%);
+                /* Blue for light mode */
+            }
+        }
+
+        /* Spinner ring around the icon */
+        .spinner-ring {
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: hsl(var(--primary));
+            border-right-color: hsl(var(--muted-foreground) / 0.3);
+            animation: spin 1.5s linear infinite;
+        }
+
+        @media (prefers-color-scheme: light) {
+            .spinner-ring {
+                border-top-color: hsl(221 83% 53%);
+                /* Blue spinner */
+            }
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.025em;
+        }
+
+        p {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            font-weight: 500;
+            border-radius: calc(var(--radius) - 4px);
+            text-decoration: none;
+            transition: transform 0.1s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        @media (prefers-color-scheme: light) {
+            .btn {
+                background-color: hsl(221 83% 53%);
+                /* Blue button */
+                color: hsl(210 40% 98%);
+                box-shadow: 0 4px 14px -3px hsl(221 83% 53% / 0.4);
+            }
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .status-message {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: hsl(var(--muted-foreground));
+            opacity: 0;
+            animation: fadeIn 0.5s ease 1s forwards;
+        }
+
+        /* Error State Styling */
+        .error-icon-bg {
+            background-color: hsl(var(--destructive) / 0.1) !important;
+        }
+
+        .error-icon-color {
+            color: hsl(var(--destructive)) !important;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="icon-wrapper" id="icon-wrapper">
+                <div class="spinner-ring" id="spinner"></div>
+                <!-- User Auth Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+            </div>
+
+            <h1 id="title">인증 진행 중...</h1>
+            <p id="description">Google 계정 인증 정보를 확인하고 있습니다. 잠시만 기다려주세요.</p>
+
+            <a id="deep-link-btn" href="#" class="btn">앱 직접 열기</a>
+
+            <div id="status" class="status-message">자동으로 앱으로 이동합니다...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            const state = params.get('state');
+            const error = params.get('error');
+
+            const titleEl = document.getElementById('title');
+            const descEl = document.getElementById('description');
+            const statusEl = document.getElementById('status');
+            const btnEl = document.getElementById('deep-link-btn');
+            const iconWrapper = document.getElementById('icon-wrapper');
+            const spinner = document.getElementById('spinner');
+
+            if (error) {
+                // Handle Error State
+                titleEl.textContent = "인증 실패";
+                descEl.textContent = "로그인 중 문제가 발생했습니다. 다시 시도해주세요.";
+                statusEl.textContent = `오류: ${error}`;
+                statusEl.style.opacity = '1';
+                spinner.style.display = 'none';
+                iconWrapper.classList.add('error-icon-bg');
+                iconWrapper.querySelector('svg').classList.add('error-icon-color');
+                btnEl.style.display = 'none';
+                return;
+            }
+
+            if (code && state) {
+                // Success State - Construct Deep Link
+                const deepLink = `hololive-app://callback${window.location.search}`;
+
+                // Update Button
+                btnEl.href = deepLink;
+
+                // Attempt Auto Redirect
+                setTimeout(() => {
+                    window.location.href = deepLink;
+
+                    // Fallback message if redirect doesn't happen immediately
+                    setTimeout(() => {
+                        statusEl.textContent = "앱이 열리지 않으면 위 버튼을 클릭해주세요.";
+                        statusEl.style.opacity = '1';
+                    }, 2000);
+                }, 500);
+
+            } else {
+                // Invalid State
+                titleEl.textContent = "잘못된 요청";
+                descEl.textContent = "인증에 필요한 정보가 누락되었습니다.";
+                spinner.style.display = 'none';
+                btnEl.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

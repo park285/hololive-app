@@ -9,13 +9,15 @@ import { formatTime } from "./StreamCard";
 interface StreamListItemProps {
     stream: Stream;
     className?: string;
+    /** Above-the-fold 이미지 여부. true면 eager 로딩 */
+    priority?: boolean;
 }
 
 /**
  * 예정된 방송을 리스트 형태로 보여주는 컴포넌트입니다.
  * 가로형 레이아웃으로 공간 효율성을 높이고 정보 전달에 집중합니다.
  */
-export const StreamListItem = memo(function StreamListItem({ stream, className }: StreamListItemProps) {
+export const StreamListItem = memo(function StreamListItem({ stream, className, priority = false }: StreamListItemProps) {
     const videoUrl = `https://www.youtube.com/watch?v=${stream.id}`;
 
     const handleLinkClick = async (e: React.MouseEvent) => {
@@ -37,8 +39,9 @@ export const StreamListItem = memo(function StreamListItem({ stream, className }
                         src={getOptimizedThumbnail(stream.thumbnail)}
                         alt={stream.title}
                         className="h-full w-full object-cover stream-list-item-thumbnail"
-                        loading="lazy"
+                        loading={priority ? "eager" : "lazy"}
                         decoding="async"
+                        fetchPriority={priority ? "high" : undefined}
                     />
                 ) : (
                     <div className="flex h-full items-center justify-center text-xs text-muted-foreground">

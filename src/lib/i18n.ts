@@ -1,12 +1,16 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+// Vite에서 빌드 시 주입되는 버전 (vite.config.ts의 define 참조)
+declare const __APP_VERSION__: string;
+
 // 한국어 번역
 const ko = {
     translation: {
         // 네비게이션
         nav: {
             dashboard: '대시보드',
+            multiview: '멀티뷰',
             members: '멤버',
             alarms: '알람',
             settings: '설정',
@@ -107,14 +111,47 @@ const ko = {
         // 앱 정보
         app: {
             name: 'Hololive Stream Notifier',
-            version: 'v0.1.0 Alpha',
+            version: __APP_VERSION__,
         },
 
         // 인증
         auth: {
-            login: 'Google 로그인',
+            login: '로그인',
             logout: '로그아웃',
             welcome: '환영합니다, {{name}}님',
+        },
+
+        // 멀티뷰
+        multiview: {
+            title: '멀티뷰',
+            cellCount: '{{count}}셀',
+            activeCount: '{{active}}/{{max}} 활성',
+            addCell: '셀 추가',
+            addAuto: '자동',
+            addAutoDesc: '빈 공간 채우기',
+            addSmall: '작게 (2x2)',
+            addSmallDesc: '작은 정사각형 (최대 64개)',
+            addMedium: '중간 (4x3)',
+            addMediumDesc: '일반적인 직사각형 (최대 24개)',
+            addLarge: '크게 (6x5)',
+            addLargeDesc: '넓은 화면 (최대 16개)',
+            editMode: '편집',
+            editDone: '완료',
+            savePreset: '프리셋 저장',
+            savePresetDesc: '현재 레이아웃 구성({{count}}개 셀)을 새로운 프리셋으로 저장합니다.',
+            presetNamePlaceholder: '프리셋 이름 입력',
+            selectPreset: '프리셋 선택...',
+            muteOn: '자동 음소거: 켜짐 (한 번에 하나만 소리 재생)',
+            muteOff: '자동 음소거: 꺼짐',
+            addStream: '스트림 추가',
+            addStreamHint: '클릭하여 방송을 선택하세요',
+            enterUrl: 'URL 직접 입력',
+            youtubeUrlTitle: 'YouTube URL 입력',
+            youtubeUrlDesc: '시청할 비디오의 링크를 붙여넣으세요',
+            invalidUrl: '유효한 YouTube URL 또는 Video ID를 입력하세요',
+            cancel: '취소',
+            confirm: '확인',
+            save: '저장',
         },
     },
 };
@@ -125,6 +162,7 @@ const en = {
         // 네비게이션
         nav: {
             dashboard: 'Dashboard',
+            multiview: 'Multiview',
             members: 'Members',
             alarms: 'Alarms',
             settings: 'Settings',
@@ -225,14 +263,47 @@ const en = {
         // 앱 정보
         app: {
             name: 'Hololive Stream Notifier',
-            version: 'v0.1.0 Alpha',
+            version: __APP_VERSION__,
         },
 
         // 인증
         auth: {
-            login: 'Sign in with Google',
+            login: 'Sign in',
             logout: 'Sign out',
             welcome: 'Welcome, {{name}}',
+        },
+
+        // 멀티뷰
+        multiview: {
+            title: 'Multiview',
+            cellCount: '{{count}} cells',
+            activeCount: '{{active}}/{{max}} active',
+            addCell: 'Add cell',
+            addAuto: 'Auto',
+            addAutoDesc: 'Fill empty space',
+            addSmall: 'Small (2x2)',
+            addSmallDesc: 'Small square (max 64)',
+            addMedium: 'Medium (4x3)',
+            addMediumDesc: 'Standard rectangle (max 24)',
+            addLarge: 'Large (6x5)',
+            addLargeDesc: 'Wide screen (max 16)',
+            editMode: 'Edit',
+            editDone: 'Done',
+            savePreset: 'Save Preset',
+            savePresetDesc: 'Save current layout ({{count}} cells) as a new preset.',
+            presetNamePlaceholder: 'Enter preset name',
+            selectPreset: 'Select preset...',
+            muteOn: 'Auto-mute: On (only one audio at a time)',
+            muteOff: 'Auto-mute: Off',
+            addStream: 'Add stream',
+            addStreamHint: 'Click to select a stream',
+            enterUrl: 'Enter URL',
+            youtubeUrlTitle: 'Enter YouTube URL',
+            youtubeUrlDesc: 'Paste the video link to watch',
+            invalidUrl: 'Enter a valid YouTube URL or Video ID',
+            cancel: 'Cancel',
+            confirm: 'OK',
+            save: 'Save',
         },
     },
 };
@@ -243,6 +314,7 @@ const ja = {
         // 네비게이션
         nav: {
             dashboard: 'ダッシュボード',
+            multiview: 'マルチビュー',
             members: 'メンバー',
             alarms: 'アラーム',
             settings: '設定',
@@ -343,14 +415,47 @@ const ja = {
         // 앱 정보
         app: {
             name: 'Hololive Stream Notifier',
-            version: 'v0.1.0 Alpha',
+            version: __APP_VERSION__,
         },
 
         // 인증
         auth: {
-            login: 'Googleでログイン',
+            login: 'ログイン',
             logout: 'ログアウト',
             welcome: 'ようこそ、{{name}}さん',
+        },
+
+        // 멀티뷰
+        multiview: {
+            title: 'マルチビュー',
+            cellCount: '{{count}}セル',
+            activeCount: '{{active}}/{{max}} アクティブ',
+            addCell: 'セル追加',
+            addAuto: '自動',
+            addAutoDesc: '空きスペースを埋める',
+            addSmall: '小 (2x2)',
+            addSmallDesc: '小さい正方形 (最大64個)',
+            addMedium: '中 (4x3)',
+            addMediumDesc: '標準長方形 (最大24個)',
+            addLarge: '大 (6x5)',
+            addLargeDesc: 'ワイド画面 (最大16個)',
+            editMode: '編集',
+            editDone: '完了',
+            savePreset: 'プリセット保存',
+            savePresetDesc: '現在のレイアウト({{count}}セル)を新しいプリセットとして保存します。',
+            presetNamePlaceholder: 'プリセット名を入力',
+            selectPreset: 'プリセット選択...',
+            muteOn: '自動ミュート: オン (一度に一つだけ音声再生)',
+            muteOff: '自動ミュート: オフ',
+            addStream: '配信を追加',
+            addStreamHint: 'クリックして配信を選択',
+            enterUrl: 'URLを入力',
+            youtubeUrlTitle: 'YouTube URLを入力',
+            youtubeUrlDesc: '視聴する動画のリンクを貼り付けてください',
+            invalidUrl: '有効なYouTube URLまたはVideo IDを入力してください',
+            cancel: 'キャンセル',
+            confirm: 'OK',
+            save: '保存',
         },
     },
 };

@@ -11,6 +11,8 @@ interface MemberCardProps {
     isAlarmEnabled?: boolean;
     onToggleAlarm?: (member: Member) => void;
     className?: string;
+    /** Above-the-fold 이미지 여부. true면 eager 로딩 */
+    priority?: boolean;
 }
 
 /**
@@ -35,7 +37,7 @@ function getMemberDisplayName(member: Member, language: string): string {
  * @param onToggleAlarm - 알람 토글 콜백 함수
  * @param className - 추가 CSS 클래스
  */
-export function MemberCard({ member, isAlarmEnabled, onToggleAlarm, className }: MemberCardProps) {
+export function MemberCard({ member, isAlarmEnabled, onToggleAlarm, className, priority = false }: MemberCardProps) {
     const { t, i18n } = useTranslation();
 
     // 현재 언어에 따라 이름 표시
@@ -64,8 +66,9 @@ export function MemberCard({ member, isAlarmEnabled, onToggleAlarm, className }:
                         "w-20 h-20 rounded-full border-2 object-cover bg-muted cursor-pointer member-card-image",
                         isAlarmEnabled ? "border-primary ring-2 ring-primary/20" : "border-border grayscale-[0.1]"
                     )}
-                    loading="lazy"
+                    loading={priority ? "eager" : "lazy"}
                     decoding="async"
+                    fetchPriority={priority ? "high" : undefined}
                     onClick={handleImageClick}
                     onError={(e) => {
                         // 최적화 실패 시 원본 URL로 fallback

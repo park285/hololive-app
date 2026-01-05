@@ -5,9 +5,9 @@ use rusqlite::params;
 
 use super::{Database, DbResult};
 
-/// 현재 스키마 버전 (향후 마이그레이션 추가 시 참조용)
+/// 현재 스키마 버전
 #[allow(dead_code)]
-const SCHEMA_VERSION: i32 = 2;
+const SCHEMA_VERSION: i32 = 3;
 
 /// 마이그레이션 실행
 pub fn run_migrations(db: &Database) -> DbResult<()> {
@@ -35,6 +35,9 @@ pub fn run_migrations(db: &Database) -> DbResult<()> {
         }
         if current_version < 2 {
             migrate_v2(conn)?;
+        }
+        if current_version < 3 {
+            migrate_v3(conn)?;
         }
 
         Ok(())
@@ -129,6 +132,51 @@ fn migrate_v2(conn: &rusqlite::Connection) -> DbResult<()> {
     conn.execute(
         "INSERT INTO schema_version (version) VALUES (?1)",
         params![2],
+    )?;
+
+    Ok(())
+}
+
+/// V3: 멀티뷰 테이블 추가
+fn migrate_v3(conn: &rusqlite::Connection) -> DbResult<()> {
+    // 멀티뷰 상태 테이블
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS multiview_state (
+            id INTEGER PRIMARY KEY DEFAULT 1,
+            layout_json TEXT NOT NULL,
+            content_json TEXT NOT NULL,
+            player_states_json TEXT,
+            mute_others_enabled INTEGER DEFAULT 1,
+            active_preset_id TEXT,
+            updated_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
+    // 멀티뷰 프리셋 테이블
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS multiview_presets (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            encoded_layout TEXT NOT NULL,
+            is_built_in INTEGER DEFAULT 0,
+            video_cell_count INTEGER NOT NULL,
+            created_at TEXT NOT NULL
+        )",
+        [],
+    )?;
+
+    // 프리셋 필터링 인덱스
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_presets_video_count 
+        ON multiview_presets(video_cell_count)",
+        [],
+    )?;
+
+    // 버전 기록
+    conn.execute(
+        "INSERT INTO schema_version (version) VALUES (?1)",
+        params![3],
     )?;
 
     Ok(())

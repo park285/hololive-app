@@ -69,6 +69,8 @@ export function formatRelativeTime(seconds: number | undefined, t: (key: string,
 interface StreamCardProps {
     stream: Stream;
     className?: string;
+    /** Above-the-fold 이미지 여부. true면 eager 로딩 */
+    priority?: boolean;
 }
 
 /**
@@ -78,7 +80,7 @@ interface StreamCardProps {
  * @param stream - 표시할 스트림 데이터
  * @param className - 추가 CSS 클래스
  */
-export function StreamCard({ stream, className }: StreamCardProps) {
+export function StreamCard({ stream, className, priority = false }: StreamCardProps) {
     const { t } = useTranslation();
     const isLive = stream.status === 'live';
 
@@ -108,8 +110,9 @@ export function StreamCard({ stream, className }: StreamCardProps) {
                         src={getOptimizedThumbnail(stream.thumbnail)}
                         alt={stream.title}
                         className="h-full w-full object-cover stream-card-thumbnail"
-                        loading="lazy"
+                        loading={priority ? "eager" : "lazy"}
                         decoding="async"
+                        fetchPriority={priority ? "high" : undefined}
                         onError={(e) => {
                             // 최적화 실패 시 원본 URL로 fallback
                             if (stream.thumbnail && e.currentTarget.src !== stream.thumbnail) {
@@ -148,8 +151,9 @@ export function StreamCard({ stream, className }: StreamCardProps) {
                             src={getOptimizedProfileImage(stream.channel.photo, 36)}
                             alt={stream.channelName}
                             className="h-9 w-9 rounded-full border border-border/50"
-                            loading="lazy"
+                            loading={priority ? "eager" : "lazy"}
                             decoding="async"
+                            fetchPriority={priority ? "high" : undefined}
                             onError={(e) => {
                                 if (stream.channel?.photo && e.currentTarget.src !== stream.channel.photo) {
                                     e.currentTarget.src = stream.channel.photo;

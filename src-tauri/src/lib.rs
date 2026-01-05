@@ -10,6 +10,7 @@ pub mod auth;
 mod commands;
 mod db;
 mod models;
+mod multiview;
 mod scheduler;
 
 use api::ApiClient;
@@ -160,12 +161,32 @@ pub fn run() {
             commands::was_notified,
             commands::record_notification,
             commands::cleanup_old_notifications,
-            // OAuth 인증
+            // OAuth 인증 (레거시)
             commands::start_google_login,
             commands::handle_deep_link_callback,
             commands::refresh_token,
             commands::logout,
             commands::get_current_user,
+            // Session 인증 (신규)
+            commands::session_login,
+            commands::session_register,
+            commands::session_logout,
+            commands::session_restore,
+            commands::session_refresh,
+            commands::session_get_current_user,
+            commands::session_request_password_reset,
+            commands::get_session_expiry,
+            // Multiview 커맨드
+            commands::fetch_video_metadata,
+            commands::encode_multiview_layout,
+            commands::decode_multiview_layout,
+            commands::save_multiview_state,
+            commands::load_multiview_state,
+            commands::save_multiview_preset,
+            commands::get_multiview_presets,
+            commands::delete_multiview_preset,
+            commands::validate_multiview_layout,
+            commands::apply_multiview_preset,
         ]);
 
     #[allow(clippy::large_stack_frames)]

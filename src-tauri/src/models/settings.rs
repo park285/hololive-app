@@ -63,7 +63,7 @@ impl Language {
 /// | TypeScript | `camelCase` | `notifyMinutesBefore` |
 ///
 /// `#[serde(rename_all = "camelCase")]`가 자동으로 변환을 수행합니다.
-/// 프론트엔드에서 설정 업데이트 시에는 **snake_case 키**를 사용해야 합니다.
+/// 프론트엔드에서 설정 업데이트 시에는 **`snake_case` 키**를 사용해야 합니다.
 /// (예: `updateSetting({ key: 'notify_minutes_before', value: '10' })`)
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -141,7 +141,7 @@ impl Default for Settings {
             notify_on_upcoming: true,
             polling_interval_seconds: 60,
             api_base_url: default_api_base_url(),
-            theme: Theme::System,
+            theme: Theme::Light,
             language: Language::Ko,
             offline_cache_enabled: true,
             hide_graduated: false,

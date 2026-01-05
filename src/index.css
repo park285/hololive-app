@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
+/* React Grid Layout */
+@import 'react-grid-layout/css/styles.css';
+@import 'react-resizable/css/styles.css';
+
 @theme {
   --font-display: "Inter", "system-ui", "sans-serif";
   --font-body: "Inter", "system-ui", "sans-serif";
@@ -125,9 +129,13 @@
 }
 
 /* Scrollbar */
+html {
+  scroll-behavior: smooth;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -135,11 +143,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
+  background-color: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 100vh;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
+  background-color: hsl(var(--muted-foreground) / 0.5);
 }
 
 /* ================================
@@ -353,4 +362,167 @@
     opacity: 1;
     max-height: 100px;
   }
+}
+
+/* ================================
+   Multiview Mobile Edit Mode
+   터치 최적화를 위한 4계층 Z-Index 구조
+   ================================ */
+
+/* Edit Mode Container */
+.mobile-edit-mode {
+  overflow-y: auto !important;
+  user-select: none;
+  /* 텍스트 선택 방지 */
+}
+
+/* Layer 1: Shield (Scroll Friendly) - z-index: 20 */
+.mobile-edit-mode .iframe-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: transparent;
+  pointer-events: auto;
+  touch-action: pan-y;
+  /* 수직 스크롤은 브라우저에게 위임 */
+}
+
+/* Layer 2: Drag Handle - z-index: 50 */
+.mobile-edit-mode .cell-drag-handle {
+  display: flex !important;
+  z-index: 50 !important;
+  touch-action: none;
+  /* 드래그 중엔 스크롤 차단 */
+}
+
+/* Layer 3: Delete Button (Higher than Shield) - z-index: 60 */
+.mobile-edit-mode .cell-delete-btn {
+  display: flex !important;
+  z-index: 60 !important;
+  /* Shield(20)보다 높아야 클릭 가능 */
+  pointer-events: auto;
+  opacity: 1 !important;
+  /* 편집 모드에서는 항상 표시 */
+}
+
+/* Layer 4: Resize Handle (Highest) - z-index: 100 */
+.mobile-edit-mode .react-resizable-handle {
+  z-index: 100 !important;
+  opacity: 1 !important;
+}
+
+/* ================================
+   Multiview Grid Styles
+   ================================ */
+
+/* Multiview Grid Styles */
+.grid-cell-wrapper {
+  @apply transition-shadow duration-200;
+}
+
+.grid-cell-wrapper:hover {
+  @apply shadow-lg;
+}
+
+.react-grid-item.react-draggable-dragging {
+  @apply z-50 shadow-2xl opacity-90;
+}
+
+.react-resizable-handle {
+  @apply opacity-0 transition-opacity;
+}
+
+.grid-cell-wrapper:hover .react-resizable-handle {
+  @apply opacity-100;
+}
+
+/* Override react-grid-layout default red placeholder - 높은 specificity 필요 */
+.react-grid-item.react-grid-placeholder {
+  background: hsl(var(--primary) / 0.2) !important;
+  border-radius: 0.5rem !important;
+  border: 2px dashed hsl(var(--primary) / 0.4) !important;
+  opacity: 0.6 !important;
+}
+
+/* React Resizable Handles Positioning */
+.react-grid-item>.react-resizable-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  z-index: 45;
+  /* Edge handles: 45 (Above content z-20) */
+  box-sizing: border-box;
+}
+
+/* Corners - High Priority */
+.react-grid-item>.react-resizable-handle.react-resizable-handle-se,
+.react-grid-item>.react-resizable-handle.react-resizable-handle-sw,
+.react-grid-item>.react-resizable-handle.react-resizable-handle-nw,
+.react-grid-item>.react-resizable-handle.react-resizable-handle-ne {
+  z-index: 50;
+  /* Corners on top of edges */
+  width: 20px;
+  height: 20px;
+}
+
+/* Corner Positions */
+.react-grid-item>.react-resizable-handle.react-resizable-handle-se {
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+}
+
+.react-grid-item>.react-resizable-handle.react-resizable-handle-sw {
+  bottom: 0;
+  left: 0;
+  cursor: sw-resize;
+}
+
+.react-grid-item>.react-resizable-handle.react-resizable-handle-nw {
+  top: 0;
+  left: 0;
+  cursor: nw-resize;
+}
+
+.react-grid-item>.react-resizable-handle.react-resizable-handle-ne {
+  top: 0;
+  right: 0;
+  cursor: ne-resize;
+}
+
+/* Edges - Full Coverage */
+.react-grid-item>.react-resizable-handle.react-resizable-handle-n {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  margin: 0;
+  cursor: n-resize;
+}
+
+.react-grid-item>.react-resizable-handle.react-resizable-handle-s {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  margin: 0;
+  cursor: s-resize;
+}
+
+.react-grid-item>.react-resizable-handle.react-resizable-handle-e {
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 100%;
+  margin: 0;
+  cursor: e-resize;
+}
+
+.react-grid-item>.react-resizable-handle.react-resizable-handle-w {
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 100%;
+  margin: 0;
+  cursor: w-resize;
 }

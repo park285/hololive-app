@@ -7,6 +7,7 @@ pub mod cache;
 mod connection;
 pub mod history;
 mod migrations;
+pub mod multiview;
 pub mod settings;
 
 pub use connection::Database;

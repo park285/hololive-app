@@ -1,10 +1,24 @@
 # Hololive Notifier - Makefile
 # Build with mandatory lint checks and security audit
 
-.PHONY: all check fmt lint audit test build dev clean install-tools help
+.PHONY: all check fmt lint audit test build dev clean install-tools help bump-version bump-patch bump-minor bump-major
 
-# Default: full check then build
-all: check build
+# Default: bump version, full check, then build
+all: bump-version check build
+
+# === Version Management ===
+bump-version:
+	@echo "[VERSION] Auto-incrementing patch version..."
+	@python scripts/bump-version.py patch
+
+bump-patch:
+	@python scripts/bump-version.py patch
+
+bump-minor:
+	@python scripts/bump-version.py minor
+
+bump-major:
+	@python scripts/bump-version.py major
 
 # === Tool Installation ===
 install-tools:
@@ -112,11 +126,16 @@ help:
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Main targets:"
-	@echo "  all            - Full check then build (default)"
+	@echo "  all            - Bump version, full check, then build (default)"
 	@echo "  dev            - Start dev server (with fast check)"
 	@echo "  build          - Release build (with full check)"
 	@echo "  check          - Full check (fmt + lint + audit)"
 	@echo "  check-fast     - Fast check (no audit)"
+	@echo ""
+	@echo "Version management:"
+	@echo "  bump-patch     - Increment patch version (0.1.0 -> 0.1.1)"
+	@echo "  bump-minor     - Increment minor version (0.1.0 -> 0.2.0)"
+	@echo "  bump-major     - Increment major version (0.1.0 -> 1.0.0)"
 	@echo ""
 	@echo "Individual checks:"
 	@echo "  fmt-check      - Format check"
@@ -130,3 +149,4 @@ help:
 	@echo "  clean          - Remove build artifacts"
 	@echo "  ci             - CI full check"
 	@echo "  pre-commit     - Pre-commit hook"
+

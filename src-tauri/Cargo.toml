@@ -1,6 +1,6 @@
 [package]
 name = "hololive-notifier"
-version = "0.1.0"
+version = "0.1.4"
 description = "Hololive Stream Notification Desktop App"
 authors = ["kapu"]
 edition = "2021"
@@ -44,6 +44,11 @@ tauri-plugin-deep-link = "2"
 # Desktop-only dependencies (rodio uses cpal which doesn't support Android)
 [target.'cfg(not(target_os = "android"))'.dependencies]
 rodio = "0.21.1"
+# OS 시스템 키체인 - 플랫폼별 feature 필수 (v3)
+# Windows: windows-native (Credential Manager)
+# macOS: apple-native (Keychain)
+# Linux: sync-secret-service (DBus Secret Service)
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
 
 # Windows-only dependencies for toast notification with click callback
 [target.'cfg(target_os = "windows")'.dependencies]
@@ -53,24 +58,24 @@ open = "5"
 [dev-dependencies]
 httpmock = "0.7"
 
-# Clippy & Rustc Lint 설정
+# Clippy & Rustc Lint ?ㅼ젙
 [lints.rust]
 unsafe_code = "warn"
 missing_docs = "allow"
 
 [lints.clippy]
-# Clippy 그룹 설정
+# Clippy 洹몃９ ?ㅼ젙
 pedantic = { level = "warn", priority = -1 }
 nursery = { level = "warn", priority = -1 }
 
-# Pedantic에서 과도한 lint들은 허용
+# Pedantic?먯꽌 怨쇰룄??lint?ㅼ? ?덉슜
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
 module_name_repetitions = "allow"
 must_use_candidate = "allow"
 too_many_lines = "allow"
 
-# 프로젝트 스타일 (명시적)
+# ?꾨줈?앺듃 ?ㅽ???(紐낆떆??
 clone_on_ref_ptr = "warn"
 dbg_macro = "warn"
 print_stdout = "warn"

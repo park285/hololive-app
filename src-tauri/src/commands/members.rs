@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use chrono::{Duration, Utc};
 use tauri::State;
@@ -11,6 +11,16 @@ use crate::AppState;
 
 /// 멤버 목록 및 프로필 이미지 캐시 유효 기간 (7일)
 const CACHE_TTL_DAYS: i64 = 7;
+
+/// `channel_id` 기준으로 중복 멤버 제거
+/// 외부 API에서 중복 데이터가 반환될 수 있으므로 안전하게 dedup 처리
+fn dedup_by_channel_id(members: Vec<Member>) -> Vec<Member> {
+    let mut seen = HashSet::new();
+    members
+        .into_iter()
+        .filter(|m| seen.insert(m.channel_id.clone()))
+        .collect()
+}
 
 /// 캐시된 프로필 이미지 맵 로드 (TTL 체크 포함)
 fn load_cached_photos(db: &Database) -> HashMap<String, String> {
@@ -65,7 +75,10 @@ async fn fetch_members_impl(state: &AppState) -> Result<Vec<Member>, ApiError> {
     let db = &state.db;
     // === Cache-First 전략 ===
     // 1. 유효한 캐시가 있으면 API 호출 없이 즉시 반환
-    if let Some(mut cached_members) = load_cached_members_if_valid(db) {
+    if let Some(cached_members_raw) = load_cached_members_if_valid(db) {
+        // 기존 캐시에 중복이 있을 수 있으므로 dedup 처리
+        let mut cached_members = dedup_by_channel_id(cached_members_raw);
+
         // 캐시된 멤버에도 프로필 이미지가 없으면 추가로 가져오기
         let cached_photos = load_cached_photos(db);
         let needs_photos = cached_members
@@ -127,7 +140,10 @@ async fn fetch_members_impl(state: &AppState) -> Result<Vec<Member>, ApiError> {
         .ok_or_else(|| ApiError::Internal("클라이언트 생성 실패".to_string()))?;
 
     match client.get_members().await {
-        Ok(mut members) => {
+        Ok(members_raw) => {
+            // 외부 API에서 중복 데이터가 반환될 수 있으므로 dedup 처리
+            let mut members = dedup_by_channel_id(members_raw);
+
             // 프로필 이미지 처리
             let mut cached_photos = load_cached_photos(db);
 
@@ -167,7 +183,7 @@ async fn fetch_members_impl(state: &AppState) -> Result<Vec<Member>, ApiError> {
             // 네트워크 에러 시 만료된 캐시라도 사용 (오프라인 지원)
             if let Some(cached) = load_cached_members_any(db) {
                 warn!("fetch_members_fallback_to_expired_cache: {err}");
-                return Ok(cached);
+                return Ok(dedup_by_channel_id(cached));
             }
             Err(err)
         }

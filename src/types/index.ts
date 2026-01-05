@@ -140,16 +140,85 @@ export interface Settings {
  * Delta Update 응답
  * 캐시된 데이터와 새 데이터를 비교하여 변경 사항만 전달합니다.
  * 네트워크 대역폭과 렌더링 성능 최적화에 사용됩니다.
+ * 
+ * Payload Diet: hasChanges가 false일 때 다른 필드는 생략됩니다.
+ * JSON 예시: {"hasChanges":false} (최소 페이로드)
  */
 export interface StreamsDeltaResponse {
-    /** 전체 스트림 목록 (변경이 있을 때만 포함) */
-    streams: Stream[];
-    /** 새로 추가된 스트림 ID 목록 */
-    added: string[];
-    /** 삭제된 스트림 ID 목록 */
-    removed: string[];
-    /** 업데이트된 스트림 ID 목록 */
-    updated: string[];
-    /** 변경 사항 존재 여부 */
+    /** 변경 사항 존재 여부 ("Trust the Flag" - 프론트엔드 판단 기준) */
     hasChanges: boolean;
+    /** 전체 스트림 목록 (변경이 있을 때만 포함, 없으면 undefined) */
+    streams?: Stream[];
+    /** 새로 추가된 스트림 ID 목록 (없으면 undefined) */
+    added?: string[];
+    /** 삭제된 스트림 ID 목록 (없으면 undefined) */
+    removed?: string[];
+    /** 업데이트된 스트림 ID 목록 (없으면 undefined) */
+    updated?: string[];
 }
+
+/**
+ * 세션 인증 에러 코드
+ * Rust 백엔드의 SessionAuthError::code()와 동일한 값
+ */
+export type SessionAuthErrorCode =
+    | 'INVALID_CREDENTIALS'
+    | 'EMAIL_EXISTS'
+    | 'INVALID_INPUT'
+    | 'UNAUTHORIZED'
+    | 'NETWORK_ERROR'
+    | 'STORAGE_ERROR'
+    | 'RATE_LIMITED'
+    | 'ACCOUNT_LOCKED'
+    | 'SESSION_EXPIRED'
+    | 'UNKNOWN';
+
+/**
+ * 커맨드 에러 응답
+ * Rust 백엔드에서 반환하는 구조화된 에러 타입
+ */
+export interface CommandError {
+    /** 에러 코드 (분기 처리용) */
+    code: SessionAuthErrorCode;
+    /** 사람이 읽을 수 있는 에러 메시지 */
+    message: string;
+}
+
+/**
+ * Tauri 커맨드 에러를 CommandError로 파싱
+ * @param error - invoke에서 throw된 에러
+ * @returns 파싱된 CommandError 또는 기본 에러
+ */
+export function parseCommandError(error: unknown): CommandError {
+    // 이미 CommandError 형태인 경우
+    if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        'message' in error
+    ) {
+        return error as CommandError;
+    }
+
+    // 문자열 에러
+    if (typeof error === 'string') {
+        return {
+            code: 'UNKNOWN',
+            message: error,
+        };
+    }
+
+    // Error 객체
+    if (error instanceof Error) {
+        return {
+            code: 'UNKNOWN',
+            message: error.message,
+        };
+    }
+
+    return {
+        code: 'UNKNOWN',
+        message: 'An unknown error occurred',
+    };
+}
+

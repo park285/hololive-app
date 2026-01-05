@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { queryKeys } from '@/api/queryKeys';
 import {
     fetchLiveStreams,
@@ -32,7 +32,7 @@ import type { Member, Alarm, Settings, Stream, StreamsDeltaResponse } from '@/ty
  */
 export function useLiveStreams(options?: { refetchInterval?: number }) {
     const queryClient = useQueryClient();
-    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
     const refetchInterval = options?.refetchInterval ?? 60_000;
 
     // 초기 데이터 로드 (전체)
@@ -49,10 +49,25 @@ export function useLiveStreams(options?: { refetchInterval?: number }) {
         try {
             const delta: StreamsDeltaResponse = await fetchLiveStreamsDelta();
 
-            if (delta.hasChanges) {
-                // 변경이 있으면 새 데이터로 캐시 업데이트
-                queryClient.setQueryData<Stream[]>(queryKeys.streams.live, delta.streams);
-                console.log(`[LiveStreams Delta] added: ${delta.added.length}, removed: ${delta.removed.length}, updated: ${delta.updated.length}`);
+            if (delta.hasChanges && delta.streams) {
+                // Structural Sharing: 변경되지 않은 객체는 기존 참조 유지
+                queryClient.setQueryData<Stream[]>(queryKeys.streams.live, (oldStreams) => {
+                    if (!oldStreams || oldStreams.length === 0) return delta.streams!;
+
+                    // 변경된 ID Set 생성 (added는 oldStreams에 없으므로 updated만 체크)
+                    const updatedIds = new Set(delta.updated ?? []);
+                    const oldMap = new Map(oldStreams.map(s => [s.id, s]));
+
+                    return delta.streams!.map(newStream => {
+                        const existing = oldMap.get(newStream.id);
+                        // 기존에 있고, updated 목록에 없으면 기존 객체 반환 (참조 유지)
+                        if (existing && !updatedIds.has(newStream.id)) {
+                            return existing;
+                        }
+                        return newStream;
+                    });
+                });
+                console.log(`[LiveStreams Delta] added: ${delta.added?.length ?? 0}, removed: ${delta.removed?.length ?? 0}, updated: ${delta.updated?.length ?? 0}`);
             }
         } catch (error) {
             console.error('[LiveStreams Delta] Error:', error);
@@ -61,17 +76,10 @@ export function useLiveStreams(options?: { refetchInterval?: number }) {
 
     // Delta polling 설정
     useEffect(() => {
-        // 초기 데이터 로드 완료 후 Delta polling 시작
-        if (query.isSuccess && !intervalRef.current) {
-            intervalRef.current = setInterval(deltaRefetch, refetchInterval);
-        }
+        if (!query.isSuccess) return;
 
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
-            }
-        };
+        const intervalId = setInterval(deltaRefetch, refetchInterval);
+        return () => clearInterval(intervalId);
     }, [query.isSuccess, deltaRefetch, refetchInterval]);
 
     return query;
@@ -86,7 +94,7 @@ export function useUpcomingStreams(options?: {
     hours?: number;
 }) {
     const queryClient = useQueryClient();
-    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
     const refetchInterval = options?.refetchInterval ?? 60_000;
     const hours = options?.hours;
 
@@ -96,6 +104,8 @@ export function useUpcomingStreams(options?: {
         queryFn: () => fetchUpcomingStreams(hours),
         staleTime: Infinity,
         gcTime: 1000 * 60 * 60,
+        // hours가 지정된 경우 Delta Polling 대신 일반 Polling 사용
+        refetchInterval: hours ? refetchInterval : undefined,
     });
 
     // Delta 기반 갱신 함수 (메모이제이션으로 불필요한 재생성 방지)
@@ -105,28 +115,35 @@ export function useUpcomingStreams(options?: {
             // hours 파라미터가 있는 경우 Delta 조회 대신 전체 리페치를 고려해야 할 수도 있음
             const delta: StreamsDeltaResponse = await fetchUpcomingStreamsDelta();
 
-            if (delta.hasChanges) {
-                queryClient.setQueryData<Stream[]>([...queryKeys.streams.upcoming, { hours }], delta.streams);
-                console.log(`[UpcomingStreams Delta] added: ${delta.added.length}, removed: ${delta.removed.length}, updated: ${delta.updated.length}`);
+            if (delta.hasChanges && delta.streams) {
+                // Structural Sharing: 변경되지 않은 객체는 기존 참조 유지
+                queryClient.setQueryData<Stream[]>([...queryKeys.streams.upcoming, { hours }], (oldStreams) => {
+                    if (!oldStreams || oldStreams.length === 0) return delta.streams!;
+
+                    const updatedIds = new Set(delta.updated ?? []);
+                    const oldMap = new Map(oldStreams.map(s => [s.id, s]));
+
+                    return delta.streams!.map(newStream => {
+                        const existing = oldMap.get(newStream.id);
+                        if (existing && !updatedIds.has(newStream.id)) {
+                            return existing;
+                        }
+                        return newStream;
+                    });
+                });
+                console.log(`[UpcomingStreams Delta] added: ${delta.added?.length ?? 0}, removed: ${delta.removed?.length ?? 0}, updated: ${delta.updated?.length ?? 0}`);
             }
         } catch (error) {
             console.error('[UpcomingStreams Delta] Error:', error);
         }
     }, [queryClient, hours]);
 
-    // Delta polling 설정
+    // Delta polling 설정 (hours가 지정된 경우 비활성화 - API 미지원)
     useEffect(() => {
-        // hours가 지정된 경우 Delta Polling 비활성화 (API 미지원)
-        if (query.isSuccess && !intervalRef.current && !hours) {
-            intervalRef.current = setInterval(deltaRefetch, refetchInterval);
-        }
+        if (!query.isSuccess || hours) return;
 
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-                intervalRef.current = null;
-            }
-        };
+        const intervalId = setInterval(deltaRefetch, refetchInterval);
+        return () => clearInterval(intervalId);
     }, [query.isSuccess, deltaRefetch, refetchInterval, hours]);
 
     return query;

@@ -1,0 +1,63 @@
+
+> hololive-notifier@0.1.2 tauri
+> tauri build
+
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `npm run build`
+
+> hololive-notifier@0.1.2 build
+> tsc && vite build
+
+[36mvite v7.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m??[39m 3 modules transformed.
+??[39m Build failed in 291ms
+error during build:
+[@tailwindcss/vite:generate:build] C:\Users\pjw\hololive-app\package.json (directory description file): SyntaxError: Unexpected token '癤?, "癤?
+    "n"... is not valid JSON
+file: C:/Users/pjw/hololive-app/src/index.css
+    at JSON.parse (<anonymous>)
+    at Object.<anonymous> (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\CachedInputFileSystem.js:625:26)
+    at CacheBackend.provideSync (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\CachedInputFileSystem.js:344:67)
+    at SyncAsyncFileSystemDecorator.readJson (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\SyncAsyncFileSystemDecorator.js:197:29)
+    at C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\DescriptionFileUtils.js:104:26
+    at next (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\forEachBail.js:35:3)
+    at forEachBail (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\forEachBail.js:49:9)
+    at findDescriptionFile (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\DescriptionFileUtils.js:70:3)
+    at C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\DescriptionFileUtils.js:167:12
+    at C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\forEachBail.js:39:13
+    at C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\DescriptionFileUtils.js:113:16
+    at SyncAsyncFileSystemDecorator.readJson (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\SyncAsyncFileSystemDecorator.js:199:14)
+    at C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\DescriptionFileUtils.js:104:26
+    at next (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\forEachBail.js:35:3)
+    at forEachBail (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\forEachBail.js:49:9)
+    at findDescriptionFile (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\DescriptionFileUtils.js:70:3)
+    at Object.loadDescriptionFile (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\DescriptionFileUtils.js:170:4)
+    at C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\DescriptionFilePlugin.js:45:27
+    at Hook.eval [as callAsync] (eval at create (C:\Users\pjw\hololive-app\node_modules\tapable\lib\HookCodeFactory.js:31:10), <anonymous>:22:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\pjw\hololive-app\node_modules\tapable\lib\Hook.js:21:14)
+    at Resolver.doResolve (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\Resolver.js:715:16)
+    at C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\ParsePlugin.js:74:14
+    at Hook.eval [as callAsync] (eval at create (C:\Users\pjw\hololive-app\node_modules\tapable\lib\HookCodeFactory.js:31:10), <anonymous>:7:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\pjw\hololive-app\node_modules\tapable\lib\Hook.js:21:14)
+    at Resolver.doResolve (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\Resolver.js:715:16)
+    at Resolver.resolve (C:\Users\pjw\hololive-app\node_modules\enhanced-resolve\lib\Resolver.js:608:15)
+    at file:///C:/Users/pjw/hololive-app/node_modules/@tailwindcss/node/dist/index.mjs:10:5635
+    at new Promise (<anonymous>)
+    at Ne (file:///C:/Users/pjw/hololive-app/node_modules/@tailwindcss/node/dist/index.mjs:10:5614)
+    at Wr (file:///C:/Users/pjw/hololive-app/node_modules/@tailwindcss/node/dist/index.mjs:10:4961)
+    at async xt (file:///C:/Users/pjw/hololive-app/node_modules/@tailwindcss/node/dist/index.mjs:10:4110)
+    at async loadStylesheet (file:///C:/Users/pjw/hololive-app/node_modules/@tailwindcss/node/dist/index.mjs:10:2950)
+    at async file:///C:/Users/pjw/hololive-app/node_modules/tailwindcss/dist/chunk-CT46QCH7.mjs:21:2585
+    at async Promise.all (index 0)
+    at async Zt (file:///C:/Users/pjw/hololive-app/node_modules/tailwindcss/dist/chunk-CT46QCH7.mjs:21:2743)
+    at async Wi (file:///C:/Users/pjw/hololive-app/node_modules/tailwindcss/dist/chunk-CT46QCH7.mjs:32:2597)
+    at async Za (file:///C:/Users/pjw/hololive-app/node_modules/tailwindcss/dist/chunk-CT46QCH7.mjs:38:631)
+    at async rf (file:///C:/Users/pjw/hololive-app/node_modules/tailwindcss/dist/chunk-CT46QCH7.mjs:38:1406)
+    at async lu (file:///C:/Users/pjw/hololive-app/node_modules/@tailwindcss/node/dist/index.mjs:10:3458)
+    at async F.generate (file:///C:/Users/pjw/hololive-app/node_modules/@tailwindcss/vite/dist/index.mjs:1:4349)
+    at async Object.handler (file:///C:/Users/pjw/hololive-app/node_modules/@tailwindcss/vite/dist/index.mjs:1:3118)
+    at async transform (file:///C:/Users/pjw/hololive-app/node_modules/rollup/dist/es/shared/node-entry.js:21234:16)
+    at async ModuleLoader.addModuleSource (file:///C:/Users/pjw/hololive-app/node_modules/rollup/dist/es/shared/node-entry.js:21448:36)
+beforeBuildCommand `npm run build` failed with exit code 1
+       Error beforeBuildCommand `npm run build` failed with exit code 1

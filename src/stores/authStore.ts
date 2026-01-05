@@ -41,6 +41,10 @@ interface AuthState {
     setError: (error: string) => void;
 }
 
+// 중복 리스너 등록 방지를 위한 모듈 레벨 플래그
+let listenerInitialized = false;
+let globalCleanup: (() => void) | null = null;
+
 export const useAuthStore = create<AuthState>()(
     persist(
         (set, get) => ({
@@ -132,6 +136,13 @@ export const useAuthStore = create<AuthState>()(
             },
 
             initializeListener: async () => {
+                // 중복 호출 방어
+                if (listenerInitialized) {
+                    console.log("[AuthStore] Listener already initialized");
+                    return globalCleanup ?? (() => { });
+                }
+                listenerInitialized = true;
+
                 // 백엔드 이벤트 리스너 설정 (Desktop용)
                 const unlistenSuccess = await listen<AuthData>("oauth-success", (event) => {
                     console.log("OAuth success event received");
@@ -161,12 +172,16 @@ export const useAuthStore = create<AuthState>()(
                     console.log("Deep link listener not available (expected on desktop):", err);
                 }
 
-                // 클린업 함수 반환
-                return () => {
+                // 클린업 함수 생성 및 저장
+                globalCleanup = () => {
                     unlistenSuccess();
                     unlistenError();
                     unlistenDeepLink?.();
+                    listenerInitialized = false;  // cleanup 시 플래그 리셋
+                    globalCleanup = null;
                 };
+
+                return globalCleanup;
             },
         }),
         {

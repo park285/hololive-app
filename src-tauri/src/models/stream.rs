@@ -15,6 +15,12 @@ pub enum StreamStatus {
 }
 
 /// YouTube/Holodex 스트림 정보
+///
+///  아래 필드들은 의도적으로 비교에서 제외됩니다:
+/// - `thumbnail`: CDN URL 쿼리 파라미터 변경으로 인한 false positive 방지
+/// - `link`: 파생 데이터
+/// - `channel`: 정적 데이터, 변경 빈도 낮음
+/// - `seconds_until_start`: 매초 변하는 파생 데이터
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Stream {
@@ -72,6 +78,23 @@ pub struct Stream {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub seconds_until_start: Option<i64>,
 }
+
+/// Delta 비교를 위한 `PartialEq`
+/// NOTE: thumbnail, link, channel, `seconds_until_start는` 비교 대상에서 제외됨
+impl PartialEq for Stream {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+            && self.title == other.title
+            && self.channel_id == other.channel_id
+            && self.channel_name == other.channel_name
+            && self.status == other.status
+            && self.start_scheduled == other.start_scheduled
+            && self.start_actual == other.start_actual
+            && self.duration == other.duration
+    }
+}
+
+impl Eq for Stream {}
 
 #[allow(dead_code)]
 impl Stream {
@@ -134,28 +157,32 @@ pub struct StreamListResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StreamsDeltaResponse {
-    /// 전체 스트림 목록 (변경이 있을 때만 포함)
-    pub streams: Vec<Stream>,
+    /// 변경 사항 존재 여부 (프론트엔드 판단 기준 - "Trust the Flag")
+    pub has_changes: bool,
+    /// 전체 스트림 목록 (변경이 있을 때만 포함, 없으면 JSON에서 생략됨)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub streams: Option<Vec<Stream>>,
     /// 새로 추가된 스트림 ID 목록
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub added: Vec<String>,
     /// 삭제된 스트림 ID 목록
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub removed: Vec<String>,
     /// 업데이트된 스트림 ID 목록
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub updated: Vec<String>,
-    /// 변경 사항 존재 여부
-    pub has_changes: bool,
 }
 
 impl StreamsDeltaResponse {
-    /// 변경 없음 응답 생성
+    /// 변경 없음 응답 생성 (Payload: {"hasChanges":false} 만 전송됨)
     #[must_use]
     pub const fn no_changes() -> Self {
         Self {
-            streams: Vec::new(),
+            has_changes: false,
+            streams: None,
             added: Vec::new(),
             removed: Vec::new(),
             updated: Vec::new(),
-            has_changes: false,
         }
     }
 
@@ -191,13 +218,14 @@ impl StreamsDeltaResponse {
 
         // 변경된 스트림 (동일 ID지만 내용이 다른 경우)
         // NOTE: intersection 결과이므로 old_map/new_map 모두 해당 키를 보유, unwrap 안전
+        // NOTE: Stream의 PartialEq 구현을 사용하여 비교 (thumbnail 등 파생 필드 제외)
         #[allow(clippy::unwrap_used)]
         let updated: Vec<String> = new_ids
             .intersection(&old_ids)
             .filter(|id| {
                 let old = old_map.get(*id).unwrap();
                 let new = new_map.get(*id).unwrap();
-                !streams_equal(old, new)
+                old != new
             })
             .map(|id| (*id).to_string())
             .collect();
@@ -205,29 +233,40 @@ impl StreamsDeltaResponse {
         let has_changes = !added.is_empty() || !removed.is_empty() || !updated.is_empty();
 
         Self {
+            has_changes,
+            // 변경이 있을 때만 전체 스트림 포함 (없으면 None → JSON에서 생략)
             streams: if has_changes {
-                new_streams.to_vec()
+                Some(new_streams.to_vec())
             } else {
-                Vec::new()
+                None
             },
             added,
             removed,
             updated,
-            has_changes,
+        }
+    }
+
+    /// 스트림 목록에 상대 시간 계산 적용 (반환 시점에 호출)
+    ///
+    /// 캐시에는 Raw Data(절대 시간)만 저장하고, 반환 시점에 이 메서드를 호출하여
+    /// `seconds_until_start` 필드를 실시간으로 계산합니다.
+    #[must_use]
+    pub fn with_computed_times(self) -> Self {
+        Self {
+            streams: self.streams.map(|streams| {
+                streams
+                    .into_iter()
+                    .map(Stream::with_computed_time)
+                    .collect()
+            }),
+            ..self
         }
     }
 }
 
-/// 두 스트림이 동일한지 비교 (주요 필드만)
-fn streams_equal(a: &Stream, b: &Stream) -> bool {
-    a.id == b.id
-        && a.title == b.title
-        && a.status == b.status
-        && a.start_scheduled == b.start_scheduled
-        && a.start_actual == b.start_actual
-        && a.duration == b.duration
-        && a.thumbnail == b.thumbnail
-}
+// NOTE: streams_equal 함수 삭제됨 - Stream의 PartialEq 구현으로 대체
+// 비교 대상 필드: id, title, channel_id, channel_name, status, start_scheduled, start_actual, duration
+// 제외 필드: thumbnail (CDN URL 변경), link, channel, seconds_until_start (파생 데이터)
 
 #[cfg(test)]
 mod tests {
@@ -319,7 +358,7 @@ mod tests {
         assert!(delta.added.is_empty());
         assert!(delta.removed.is_empty());
         assert!(delta.updated.is_empty());
-        assert!(delta.streams.is_empty()); // 변경 없으면 빈 배열
+        assert!(delta.streams.is_none()); // 변경 없으면 None (Payload Diet)
     }
 
     #[test]
@@ -338,7 +377,7 @@ mod tests {
         assert!(delta.added.contains(&"vid2".to_string()));
         assert!(delta.removed.is_empty());
         assert!(delta.updated.is_empty());
-        assert_eq!(delta.streams.len(), 2);
+        assert_eq!(delta.streams.as_ref().unwrap().len(), 2);
     }
 
     #[test]
@@ -431,7 +470,7 @@ mod tests {
         let delta = StreamsDeltaResponse::no_changes();
 
         assert!(!delta.has_changes);
-        assert!(delta.streams.is_empty());
+        assert!(delta.streams.is_none()); // Payload Diet: None → JSON에서 생략됨
         assert!(delta.added.is_empty());
         assert!(delta.removed.is_empty());
         assert!(delta.updated.is_empty());

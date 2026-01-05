@@ -1,0 +1,170 @@
+    Finished `test` profile [optimized + debuginfo] target(s) in 0.36s
+     Running unittests src\lib.rs (target\debug\deps\hololive_notifier_lib-9e3fc11dd5100c9f.exe)
+
+running 91 tests
+test api::client::tests::test_new_rejects_invalid_base_url ... ok
+test api::error::tests::test_api_error_serializes_as_string ... ok
+test auth::tests::test_state_generation ... ok
+test auth::tests::test_pkce_generation ... ok
+test api::channels::tests::test_get_channels_batch_empty ... ok
+test commands::members::tests::test_filter_members_by_query_trims_and_filters ... ok
+test commands::members::tests::test_filter_members_hides_graduated ... ok
+test api::client::tests::test_get_live_streams_success ... ok
+test api::client::tests::test_get_live_streams_rejects_unexpected_status_field ... ok
+test api::channels::tests::test_get_channels_batch_success ... ok
+test api::client::tests::test_get_json_rejects_invalid_json_body ... ok
+test api::channels::tests::test_get_channel_not_found ... ok
+test api::channels::tests::test_get_channel_success ... ok
+test api::client::tests::test_get_json_returns_http_status_error_with_message ... ok
+test api::profiles::tests::test_get_profile_not_found ... ok
+test api::profiles::tests::test_get_profile_by_name_success ... ok
+test commands::alarms::tests::test_add_alarm_with_multilang_names ... ok
+test commands::alarms::tests::test_add_alarm_impl_validates_inputs_and_defaults ... ok
+test commands::alarms::tests::test_remove_and_toggle_impl_validation ... ok
+test commands::history::tests::test_was_notified_impl_validation ... ok
+test commands::history::tests::test_record_and_cleanup_impl_paths ... ok
+test commands::members::tests::test_load_cached_members_any_returns_expired_data ... ok
+test commands::settings::tests::test_update_setting_impl_validates_and_persists ... ok
+test commands::members::tests::test_load_cached_photos_returns_empty_when_no_cache ... ok
+test commands::members::tests::test_save_photos_to_cache_and_reload ... ok
+test commands::streams::tests::test_load_cached_streams_any_returns_expired_data ... ok
+test commands::members::tests::test_load_cached_photos_returns_data_when_fresh ... ok
+test db::cache::tests::test_cache_key_to_string ... ok
+test commands::members::tests::test_load_cached_members_if_valid_returns_data_when_fresh ... ok
+test commands::members::tests::test_load_cached_members_if_valid_returns_none_when_expired ... ok
+test commands::streams::tests::test_load_cached_streams_if_valid_returns_data_when_fresh ... ok
+test db::alarms::tests::test_get_enabled_alarms_and_update_notify_minutes ... ok
+test commands::streams::tests::test_try_load_cache_returns_none_when_empty ... ok
+test db::alarms::tests::test_alarm_upsert_and_not_found_errors ... ok
+test db::alarms::tests::test_alarm_crud ... ok
+test commands::streams::tests::test_try_load_cache_returns_none_for_invalid_json ... ok
+test db::tests::test_db_error_serializes_as_string ... ok
+test models::alarm::tests::test_alarm_defaults_and_custom_minutes ... ok
+test models::alarm::tests::test_notification_history_schedule_change_and_message ... ok
+test db::cache::tests::test_cache_crud ... ok
+test models::channel::tests::test_display_name_prefers_english_name ... ok
+test commands::streams::tests::test_load_cached_streams_if_valid_returns_none_when_expired ... ok
+test models::channel::tests::test_format_korean_number ... ok
+test models::channel::tests::test_formatted_subscriber_count ... ok
+test models::channel::tests::test_youtube_url ... ok
+test models::member::tests::test_all_aliases ... ok
+test models::member::tests::test_all_aliases_empty ... ok
+test models::member::tests::test_all_aliases_partial ... ok
+test models::member::tests::test_display_name_prefers_korean ... ok
+test models::member::tests::test_display_name_fallback_chain ... ok
+test models::member::tests::test_matches_query_case_insensitive ... ok
+test models::member::tests::test_matches_query_by_name_and_alias ... ok
+test models::member::tests::test_matches_query_partial ... ok
+test models::member::tests::test_member_deserialize_defaults ... ok
+test models::member::tests::test_member_deserialize_with_graduated ... ok
+test models::member::tests::test_member_deserialize_with_is_graduated ... ok
+test models::member::tests::test_member_list_response_deserialize ... ok
+test models::member::tests::test_member_list_response_without_status ... ok
+test models::settings::tests::test_update_parses_numbers_booleans_and_enums ... ok
+test models::settings::tests::test_update_rejects_invalid_values ... ok
+test models::settings::tests::test_update_rejects_unknown_key ... ok
+test models::stream::tests::test_delta_added_streams ... ok
+test models::stream::tests::test_delta_empty_new ... ok
+test models::stream::tests::test_delta_empty_old ... ok
+test models::stream::tests::test_delta_mixed_changes ... ok
+test models::stream::tests::test_delta_no_changes ... ok
+test models::stream::tests::test_delta_no_changes_response ... ok
+test models::stream::tests::test_delta_removed_streams ... ok
+test models::stream::tests::test_delta_updated_streams ... ok
+test models::stream::tests::test_minutes_until_start_at ... ok
+test models::stream::tests::test_minutes_until_start_no_scheduled ... ok
+test models::stream::tests::test_seconds_until_start_at ... ok
+test models::stream::tests::test_should_notify_at ... ok
+test models::stream::tests::test_with_computed_time ... ok
+test models::stream::tests::test_youtube_url ... ok
+test scheduler::tests::test_build_youtube_url_generates_correct_url ... ok
+test db::cache::tests::test_cache_entry_cached_at ... ok
+test scheduler::tests::test_build_youtube_url_handles_empty_id ... ok
+test scheduler::tests::test_polling_interval_seconds_applies_min_and_defaults ... ok
+test tests::test_greet ... ok
+test db::cache::tests::test_cache_ttl_valid ... ok
+test db::cache::tests::test_clear_all_cache ... ok
+test db::cache::tests::test_cache_ttl_simulation ... ok
+test db::cache::tests::test_multiple_cache_keys_isolation ... ok
+test db::cache::tests::test_cache_get_nonexistent ... ok
+test db::history::tests::test_cleanup_old_notifications_and_update_schedule ... ok
+test db::history::tests::test_notification_history ... ok
+test db::settings::tests::test_settings_crud ... ok
+test db::migrations::tests::test_migrations ... ok
+test db::settings::tests::test_get_settings_ignores_invalid_values ... ok
+test api::profiles::tests::test_get_profile_by_channel_id_success ... FAILED
+
+failures:
+
+---- api::profiles::tests::test_get_profile_by_channel_id_success stdout ----
+
+thread 'api::profiles::tests::test_get_profile_by_channel_id_success' (29732) panicked at src\api\profiles.rs:150:9:
+assertion `left == right` failed
+  left: None
+ right: Some("Sakura Miko")
+stack backtrace:
+   0: std::panicking::panic_handler
+             at /rustc/ded5c06cf21d2b93bffd5d884aa6e96934ee4234/library\std\src\panicking.rs:698
+   1: core::panicking::panic_fmt
+             at /rustc/ded5c06cf21d2b93bffd5d884aa6e96934ee4234/library\core\src\panicking.rs:80
+   2: core::panicking::assert_failed_inner
+             at /rustc/ded5c06cf21d2b93bffd5d884aa6e96934ee4234/library\core\src\panicking.rs:439
+   3: core::panicking::assert_failed<enum2$<core::option::Option<alloc::string::String> >,enum2$<core::option::Option<alloc::string::String> > >
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\panicking.rs:399
+   4: hololive_notifier_lib::api::profiles::tests::test_get_profile_by_channel_id_success::async_block$0
+             at .\src\api\profiles.rs:150
+   5: core::future::future::impl$1::poll
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\future\future.rs:133
+   6: core::future::future::impl$1::poll
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\future\future.rs:133
+   7: tokio::runtime::scheduler::current_thread::impl$9::block_on::closure$0::closure$0::closure$0
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:753
+   8: tokio::task::coop::with_budget
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\task\coop\mod.rs:167
+   9: tokio::task::coop::budget
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\task\coop\mod.rs:133
+  10: tokio::runtime::scheduler::current_thread::impl$9::block_on::closure$0::closure$0
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:753
+  11: tokio::runtime::scheduler::current_thread::Context::enter<enum2$<core::task::poll::Poll<tuple$<> > >,tokio::runtime::scheduler::current_thread::impl$9::block_on::closure$0::closure_env$0<core::pin::Pin<ref_mut$<core::pin::Pin<ref_mut$<dyn$<core::future::fu
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:442
+  12: tokio::runtime::scheduler::current_thread::impl$9::enter::closure$0
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:840
+  13: tokio::runtime::context::scoped::Scoped<enum2$<tokio::runtime::scheduler::Context> >::set<enum2$<tokio::runtime::scheduler::Context>,tokio::runtime::scheduler::current_thread::impl$9::enter::closure_env$0<tokio::runtime::scheduler::current_thread::impl$9::
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\context\scoped.rs:40
+  14: tokio::runtime::context::set_scheduler::closure$0
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\context.rs:176
+  15: std::thread::local::LocalKey<tokio::runtime::context::Context>::try_with
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\std\src\thread\local.rs:508
+  16: std::thread::local::LocalKey<tokio::runtime::context::Context>::with
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\std\src\thread\local.rs:472
+  17: tokio::runtime::context::set_scheduler
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\context.rs:176
+  18: tokio::runtime::scheduler::current_thread::CoreGuard::enter
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:840
+  19: tokio::runtime::scheduler::current_thread::CoreGuard::block_on<core::pin::Pin<ref_mut$<core::pin::Pin<ref_mut$<dyn$<core::future::future::Future<assoc$<Output,tuple$<> > > > > > > > >
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:740
+  20: tokio::runtime::context::runtime::enter_runtime<tokio::runtime::scheduler::current_thread::impl$0::block_on::closure_env$0<core::pin::Pin<ref_mut$<dyn$<core::future::future::Future<assoc$<Output,tuple$<> > > > > > >,tuple$<> >
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\context\runtime.rs:65
+  21: tokio::runtime::runtime::Runtime::block_on_inner
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\runtime.rs:368
+  22: tokio::runtime::runtime::Runtime::block_on<core::pin::Pin<ref_mut$<dyn$<core::future::future::Future<assoc$<Output,tuple$<> > > > > > >
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\runtime.rs:342
+  23: hololive_notifier_lib::api::profiles::tests::test_get_profile_by_channel_id_success
+             at .\src\api\profiles.rs:150
+  24: hololive_notifier_lib::api::profiles::tests::test_get_profile_by_channel_id_success::closure$0
+             at .\src\api\profiles.rs:114
+  25: core::ops::function::FnOnce::call_once<hololive_notifier_lib::api::profiles::tests::test_get_profile_by_channel_id_success::closure_env$0,tuple$<> >
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\ops\function.rs:250
+  26: core::ops::function::FnOnce::call_once
+             at /rustc/ded5c06cf21d2b93bffd5d884aa6e96934ee4234/library\core\src\ops\function.rs:250
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+
+failures:
+    api::profiles::tests::test_get_profile_by_channel_id_success
+
+test result: FAILED. 90 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `--lib`
+error: 1 target failed:
+    `--lib`

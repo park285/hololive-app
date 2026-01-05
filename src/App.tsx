@@ -1,13 +1,19 @@
 import { Routes, Route, HashRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense } from "react";
 import { Layout } from "@/components/Layout";
 import DashboardPage from "@/pages/DashboardPage";
 import MembersPage from "@/pages/MembersPage";
 import AlarmsPage from "@/pages/AlarmsPage";
 import SettingsPage from "@/pages/SettingsPage";
+import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+
+const MultiviewPage = lazy(() => import("@/components/multiview/MultiviewPage"));
+import { MultiviewSkeleton } from "@/components/multiview/MultiviewSkeleton";
 import { useEffect } from "react";
 import { useSettings } from "@/hooks/useHoloQueries";
-import { useAuthStore } from "@/stores/authStore";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import {
   onAction,
@@ -15,6 +21,11 @@ import {
   isPermissionGranted,
   requestPermission,
 } from "@tauri-apps/plugin-notification";
+import { useSessionRestore } from "@/hooks/useSessionRestore";
+import { useSessionAutoRefresh } from "@/hooks/useSessionAutoRefresh";
+import { useSessionExpiredListener } from "@/hooks/useSessionExpiredListener";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { ToastContainer } from "@/components/ui/Toast";
 
 // NOTE: Tauri 앱의 `file://` 프로토콜 환경에서 라우팅 호환성을 보장하기 위해 `HashRouter`를 사용함
 
@@ -68,25 +79,13 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-
-
 function AppContent() {
-  const initializeAuthListener = useAuthStore((state) => state.initializeListener);
-  const refreshAccessToken = useAuthStore((state) => state.refreshAccessToken);
-  const { expiresAt, isAuthenticated } = useAuthStore();
+  // 세션 복원 및 자동 갱신 훅 사용 (로그인된 경우에만 동작)
+  useSessionRestore();
+  useSessionAutoRefresh();
+  useSessionExpiredListener();  // 백엔드 세션 만료 이벤트 리스너
 
   useEffect(() => {
-    // 앱 시작 시 OAuth 리스너 등록
-    const setupListener = async () => {
-      const unlisten = await initializeAuthListener();
-      return unlisten;
-    };
-
-    let authCleanup: (() => void) | undefined;
-    setupListener().then((unlisten) => {
-      authCleanup = unlisten;
-    });
-
     // 알림 권한 요청 및 Action Type 등록, 클릭 리스너 설정 (Mobile에서만 필요)
     // Desktop에서는 Rust 레벨의 notify-rust가 클릭 처리를 담당
     let notificationCleanup: (() => void) | undefined;
@@ -101,8 +100,6 @@ function AppContent() {
         }
 
         // Mobile에서만 Action Type 등록 및 onAction 리스너 설정
-        // Desktop에서는 notify-rust가 클릭 처리를 담당하므로 등록 시도하지 않음
-        // registerActionTypes는 Mobile에서만 지원되므로 에러 발생 시 무시
         try {
           await registerActionTypes([
             {
@@ -145,32 +142,36 @@ function AppContent() {
       notificationCleanup = unlisten;
     });
 
-    // 토큰 만료 체크 및 갱신
-    if (isAuthenticated && expiresAt) {
-      const now = Math.floor(Date.now() / 1000);
-      // 만료 5분 전이면 갱신 시도
-      if (expiresAt - now < 300) {
-        console.log("Token expiring soon, refreshing...");
-        refreshAccessToken();
-      }
-    }
-
     return () => {
-      if (authCleanup) authCleanup();
       if (notificationCleanup) notificationCleanup();
     };
-  }, [initializeAuthListener, refreshAccessToken, expiresAt, isAuthenticated]);
+  }, []);
 
   return (
     <ThemeProvider>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/members" element={<MembersPage />} />
-          <Route path="/alarms" element={<AlarmsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
-      </Layout>
+      {/* 인증 모달 - 전역에서 접근 가능 */}
+      <AuthModal />
+      <Routes>
+        {/* Auth Routes (Optional Login) - 모달화되었으나 직접 URL 접근 유지 */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+        {/* Main App Routes (No Authentication Required) */}
+        <Route path="/" element={<Layout><DashboardPage /></Layout>} />
+        <Route path="/members" element={<Layout><MembersPage /></Layout>} />
+        <Route path="/alarms" element={<Layout><AlarmsPage /></Layout>} />
+        <Route path="/settings" element={<Layout><SettingsPage /></Layout>} />
+
+
+        <Route path="/multiview" element={
+          <Layout>
+            <Suspense fallback={<MultiviewSkeleton />}>
+              <MultiviewPage />
+            </Suspense>
+          </Layout>
+        } />
+      </Routes>
     </ThemeProvider>
   );
 }
@@ -181,6 +182,7 @@ export default function App() {
       <HashRouter>
         <AppContent />
       </HashRouter>
+      <ToastContainer />
     </QueryClientProvider>
   );
 }

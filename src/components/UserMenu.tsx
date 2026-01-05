@@ -1,4 +1,5 @@
-import { useAuthStore } from "@/stores/authStore";
+import { useSessionAuthStore } from "@/stores/sessionAuthStore";
+import { useModalStore } from "@/stores/modalStore";
 import { LogIn, LogOut, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -8,8 +9,14 @@ export interface UserMenuProps {
 }
 
 export function UserMenu({ className, compact = false }: UserMenuProps) {
-    const { user, isAuthenticated, isLoading, startLogin, logout } = useAuthStore();
+    const { user, isAuthenticated, isLoading, logout } = useSessionAuthStore();
+    const { openAuthModal } = useModalStore();
     const { t } = useTranslation();
+
+    /** 로그인 버튼 클릭 시 인증 모달 열기 */
+    const handleLogin = () => {
+        openAuthModal('login');
+    };
 
     if (isLoading) {
         if (compact) {
@@ -39,8 +46,8 @@ export function UserMenu({ className, compact = false }: UserMenuProps) {
                         }}
                         className="relative"
                     >
-                        {user.picture ? (
-                            <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border border-border bg-background object-cover" />
+                        {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt={user.displayName} className="w-8 h-8 rounded-full border border-border bg-background object-cover" />
                         ) : (
                             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-primary/20">
                                 <User className="w-4 h-4" />
@@ -54,8 +61,8 @@ export function UserMenu({ className, compact = false }: UserMenuProps) {
 
         return (
             <div className={`flex items-center gap-3 p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors group relative ${className}`}>
-                {user.picture ? (
-                    <img src={user.picture} alt={user.name} className="w-8 h-8 rounded-full border border-border bg-background object-cover" />
+                {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.displayName} className="w-8 h-8 rounded-full border border-border bg-background object-cover" />
                 ) : (
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-primary/20">
                         <User className="w-4 h-4" />
@@ -63,7 +70,7 @@ export function UserMenu({ className, compact = false }: UserMenuProps) {
                 )}
 
                 <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{user.name}</p>
+                    <p className="text-sm font-medium truncate">{user.displayName}</p>
                     <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                 </div>
 
@@ -81,9 +88,9 @@ export function UserMenu({ className, compact = false }: UserMenuProps) {
     if (compact) {
         return (
             <button
-                onClick={() => startLogin()}
+                onClick={handleLogin}
                 className={`p-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors ${className}`}
-                title={t('auth.login') || "Google Login"}
+                title={t('auth.login') || "Login"}
             >
                 <LogIn className="w-5 h-5" />
             </button>
@@ -92,11 +99,11 @@ export function UserMenu({ className, compact = false }: UserMenuProps) {
 
     return (
         <button
-            onClick={() => startLogin()}
-            className={`flex items-center justify-center gap-2 w-full p-2.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm ${className}`}
+            onClick={handleLogin}
+            className={`flex items-center justify-center gap-2 w-full py-1.5 px-3 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm ${className}`}
         >
             <LogIn className="w-4 h-4" />
-            {t('auth.login') || "Google Login"}
+            {t('auth.login') || "Login"}
         </button>
     );
 }

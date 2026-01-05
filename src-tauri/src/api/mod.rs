@@ -6,6 +6,7 @@ mod client;
 mod error;
 mod members;
 pub mod profiles;
+pub mod session_auth;
 mod streams;
 
 pub use client::ApiClient;

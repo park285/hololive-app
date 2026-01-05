@@ -69,15 +69,22 @@ export default function AlarmsPage() {
                     <div className="h-8 w-32 bg-muted rounded animate-pulse" />
                     <div className="h-5 w-16 bg-muted rounded animate-pulse" />
                 </div>
-                <div className="space-y-4">
-                    <div className="text-center text-muted-foreground animate-pulse py-4">
-                        {t('common.loadingAlarms')}
-                    </div>
-                    <div className="grid gap-4">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="h-20 rounded-xl bg-muted animate-pulse" />
-                        ))}
-                    </div>
+                <div className="grid gap-4">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-border bg-card animate-pulse">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2 rounded-full bg-muted w-9 h-9" />
+                                <div className="space-y-2">
+                                    <div className="h-4 bg-muted rounded w-24" />
+                                    <div className="h-3 bg-muted rounded w-32" />
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-11 h-6 bg-muted rounded-full" />
+                                <div className="w-8 h-8 rounded-full bg-muted" />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         );
@@ -111,7 +118,7 @@ export default function AlarmsPage() {
             <div className="grid gap-4">
                 {alarms.map((alarm) => (
                     <div
-                        key={alarm.channelId}
+                        key={alarm.id}
                         className={cn(
                             "flex items-center justify-between p-4 rounded-xl border transition-all",
                             alarm.enabled

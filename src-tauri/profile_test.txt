@@ -1,0 +1,77 @@
+    Finished `test` profile [optimized + debuginfo] target(s) in 0.33s
+     Running unittests src\lib.rs (target\debug\deps\hololive_notifier_lib-9e3fc11dd5100c9f.exe)
+
+running 3 tests
+
+thread 'api::profiles::tests::test_get_profile_by_channel_id_success' (37164) panicked at src\api\profiles.rs:150:9:
+assertion `left == right` failed
+  left: None
+ right: Some("Sakura Miko")
+stack backtrace:
+test api::profiles::tests::test_get_profile_not_found ... ok
+test api::profiles::tests::test_get_profile_by_name_success ... ok
+   0: std::panicking::panic_handler
+             at /rustc/ded5c06cf21d2b93bffd5d884aa6e96934ee4234/library\std\src\panicking.rs:698
+   1: core::panicking::panic_fmt
+             at /rustc/ded5c06cf21d2b93bffd5d884aa6e96934ee4234/library\core\src\panicking.rs:80
+   2: core::panicking::assert_failed_inner
+             at /rustc/ded5c06cf21d2b93bffd5d884aa6e96934ee4234/library\core\src\panicking.rs:439
+   3: core::panicking::assert_failed<enum2$<core::option::Option<alloc::string::String> >,enum2$<core::option::Option<alloc::string::String> > >
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\panicking.rs:399
+   4: hololive_notifier_lib::api::profiles::tests::test_get_profile_by_channel_id_success::async_block$0
+             at .\src\api\profiles.rs:150
+   5: core::future::future::impl$1::poll
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\future\future.rs:133
+   6: core::future::future::impl$1::poll
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\future\future.rs:133
+   7: tokio::runtime::scheduler::current_thread::impl$9::block_on::closure$0::closure$0::closure$0
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:753
+   8: tokio::task::coop::with_budget
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\task\coop\mod.rs:167
+   9: tokio::task::coop::budget
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\task\coop\mod.rs:133
+  10: tokio::runtime::scheduler::current_thread::impl$9::block_on::closure$0::closure$0
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:753
+  11: tokio::runtime::scheduler::current_thread::Context::enter<enum2$<core::task::poll::Poll<tuple$<> > >,tokio::runtime::scheduler::current_thread::impl$9::block_on::closure$0::closure_env$0<core::pin::Pin<ref_mut$<core::pin::Pin<ref_mut$<dyn$<core::future::fu
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:442
+  12: tokio::runtime::scheduler::current_thread::impl$9::enter::closure$0
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:840
+  13: tokio::runtime::context::scoped::Scoped<enum2$<tokio::runtime::scheduler::Context> >::set<enum2$<tokio::runtime::scheduler::Context>,tokio::runtime::scheduler::current_thread::impl$9::enter::closure_env$0<tokio::runtime::scheduler::current_thread::impl$9::
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\context\scoped.rs:40
+  14: tokio::runtime::context::set_scheduler::closure$0
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\context.rs:176
+  15: std::thread::local::LocalKey<tokio::runtime::context::Context>::try_with
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\std\src\thread\local.rs:508
+  16: std::thread::local::LocalKey<tokio::runtime::context::Context>::with
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\std\src\thread\local.rs:472
+  17: tokio::runtime::context::set_scheduler
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\context.rs:176
+  18: tokio::runtime::scheduler::current_thread::CoreGuard::enter
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:840
+  19: tokio::runtime::scheduler::current_thread::CoreGuard::block_on<core::pin::Pin<ref_mut$<core::pin::Pin<ref_mut$<dyn$<core::future::future::Future<assoc$<Output,tuple$<> > > > > > > > >
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\scheduler\current_thread\mod.rs:740
+  20: tokio::runtime::context::runtime::enter_runtime<tokio::runtime::scheduler::current_thread::impl$0::block_on::closure_env$0<core::pin::Pin<ref_mut$<dyn$<core::future::future::Future<assoc$<Output,tuple$<> > > > > > >,tuple$<> >
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\context\runtime.rs:65
+  21: tokio::runtime::runtime::Runtime::block_on_inner
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\runtime.rs:368
+  22: tokio::runtime::runtime::Runtime::block_on<core::pin::Pin<ref_mut$<dyn$<core::future::future::Future<assoc$<Output,tuple$<> > > > > > >
+             at C:\Users\pjw\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.49.0\src\runtime\runtime.rs:342
+  23: hololive_notifier_lib::api::profiles::tests::test_get_profile_by_channel_id_success
+             at .\src\api\profiles.rs:150
+  24: hololive_notifier_lib::api::profiles::tests::test_get_profile_by_channel_id_success::closure$0
+             at .\src\api\profiles.rs:114
+  25: core::ops::function::FnOnce::call_once<hololive_notifier_lib::api::profiles::tests::test_get_profile_by_channel_id_success::closure_env$0,tuple$<> >
+             at C:\Users\pjw\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\src\rust\library\core\src\ops\function.rs:250
+  26: core::ops::function::FnOnce::call_once
+             at /rustc/ded5c06cf21d2b93bffd5d884aa6e96934ee4234/library\core\src\ops\function.rs:250
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+test api::profiles::tests::test_get_profile_by_channel_id_success ... FAILED
+
+failures:
+
+failures:
+    api::profiles::tests::test_get_profile_by_channel_id_success
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 88 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `--lib`

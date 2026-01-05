@@ -2,11 +2,27 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import fs from "fs";
 
 const host = process.env.TAURI_DEV_HOST;
 
+// VERSION 파일에서 버전 읽기 (Single Source of Truth)
+const getAppVersion = (): string => {
+  try {
+    const versionFile = path.resolve(__dirname, "VERSION");
+    return fs.readFileSync(versionFile, "utf-8").trim();
+  } catch {
+    // fallback to package.json
+    const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, "package.json"), "utf-8"));
+    return pkg.version;
+  }
+};
+
 // https://vite.dev/config/
 export default defineConfig(async () => ({
+  define: {
+    __APP_VERSION__: JSON.stringify(`v${getAppVersion()} Alpha`),
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

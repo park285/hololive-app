@@ -42,6 +42,18 @@ fn load_cached_streams_any(db: &Database, key: &CacheKey) -> Option<Vec<Stream>>
         .and_then(|entry| serde_json::from_str(&entry.data).ok())
 }
 
+/// 스트림 목록에 상대 시간 계산 적용 (반환 시점에 호출)
+///
+/// 캐시에는 Raw Data(절대 시간)만 저장하고, 반환 시점에 이 함수를 호출하여
+/// `seconds_until_start` 필드를 실시간으로 계산합니다.
+/// 이로써 캐시 TTL(60초) 동안 시간 오차가 발생하는 문제를 방지합니다.
+fn compute_relative_times(streams: Vec<Stream>) -> Vec<Stream> {
+    streams
+        .into_iter()
+        .map(Stream::with_computed_time)
+        .collect()
+}
+
 async fn fetch_live_streams_impl(state: &AppState) -> Result<Vec<Stream>, ApiError> {
     let db = &state.db;
 
@@ -52,7 +64,8 @@ async fn fetch_live_streams_impl(state: &AppState) -> Result<Vec<Stream>, ApiErr
             "live_stream_cache_hit: returning {} streams from cache",
             cached_streams.len()
         );
-        return Ok(cached_streams);
+        // NOTE: 반환 시점에 상대 시간 계산 (캐시된 Raw Data → Computed Response)
+        return Ok(compute_relative_times(cached_streams));
     }
 
     // 2. 캐시가 없거나 만료됨 → API에서 갱신
@@ -62,13 +75,7 @@ async fn fetch_live_streams_impl(state: &AppState) -> Result<Vec<Stream>, ApiErr
 
     match client.get_live_streams().await {
         Ok(streams) => {
-            // NOTE: 프론트엔드 렌더링 최적화를 위해 상대 시간을 사전 계산함
-            let streams: Vec<Stream> = streams
-                .into_iter()
-                .map(super::super::models::stream::Stream::with_computed_time)
-                .collect();
-
-            // 성공 시 캐시 저장
+            // 캐시에는 Raw Data(절대 시간)만 저장 - 상대 시간 계산 없음
             if let Ok(json) = serde_json::to_string(&streams) {
                 let _ = db.set_cache(&CacheKey::LiveStreams, &json);
             }
@@ -76,13 +83,15 @@ async fn fetch_live_streams_impl(state: &AppState) -> Result<Vec<Stream>, ApiErr
                 "live_stream_cache_refreshed: {} streams cached",
                 streams.len()
             );
-            Ok(streams)
+            // NOTE: 반환 시점에 상대 시간 계산 (Raw Data → Computed Response)
+            Ok(compute_relative_times(streams))
         }
         Err(err) => {
             // 네트워크 에러 시 만료된 캐시라도 사용 (오프라인 지원)
             if let Some(cached) = load_cached_streams_any(db, &CacheKey::LiveStreams) {
                 warn!("fetch_live_streams_fallback_to_expired_cache: {err}");
-                return Ok(cached);
+                // NOTE: 만료된 캐시도 반환 시점에 상대 시간 재계산
+                return Ok(compute_relative_times(cached));
             }
             Err(err)
         }
@@ -105,7 +114,8 @@ async fn fetch_upcoming_streams_impl(
             cached_streams.len(),
             hours
         );
-        return Ok(cached_streams);
+        // NOTE: 반환 시점에 상대 시간 계산 (캐시된 Raw Data → Computed Response)
+        return Ok(compute_relative_times(cached_streams));
     }
 
     // 2. 캐시가 없거나 만료됨 → API에서 갱신
@@ -115,13 +125,7 @@ async fn fetch_upcoming_streams_impl(
 
     match client.get_upcoming_streams(hours).await {
         Ok(streams) => {
-            // NOTE: 프론트엔드 렌더링 최적화를 위해 상대 시간을 사전 계산함
-            let streams: Vec<Stream> = streams
-                .into_iter()
-                .map(super::super::models::stream::Stream::with_computed_time)
-                .collect();
-
-            // 성공 시 캐시 저장
+            // 캐시에는 Raw Data(절대 시간)만 저장 - 상대 시간 계산 없음
             if let Ok(json) = serde_json::to_string(&streams) {
                 let _ = db.set_cache(&CacheKey::UpcomingStreams(hours), &json);
             }
@@ -129,13 +133,15 @@ async fn fetch_upcoming_streams_impl(
                 "upcoming_stream_cache_refreshed: {} streams cached",
                 streams.len()
             );
-            Ok(streams)
+            // NOTE: 반환 시점에 상대 시간 계산 (Raw Data → Computed Response)
+            Ok(compute_relative_times(streams))
         }
         Err(err) => {
             // 네트워크 에러 시 만료된 캐시라도 사용 (오프라인 지원)
             if let Some(cached) = load_cached_streams_any(db, &CacheKey::UpcomingStreams(hours)) {
                 warn!("fetch_upcoming_streams_fallback_to_expired_cache: {err}");
-                return Ok(cached);
+                // NOTE: 만료된 캐시도 반환 시점에 상대 시간 재계산
+                return Ok(compute_relative_times(cached));
             }
             Err(err)
         }
@@ -195,24 +201,19 @@ async fn fetch_streams_delta_impl(
     };
 
     match new_streams_result {
-        Ok(streams) => {
-            // 상대 시간 사전 계산
-            let new_streams: Vec<Stream> = streams
-                .into_iter()
-                .map(super::super::models::stream::Stream::with_computed_time)
-                .collect();
-
-            // Delta 변경사항 계산
+        Ok(new_streams) => {
+            // Delta 변경사항 계산 (Raw Data 기준 비교)
             let delta = StreamsDeltaResponse::compute(&old_streams, &new_streams);
 
-            // 변경이 있을 때만 캐시 업데이트
+            // 변경이 있을 때만 캐시 업데이트 (Raw Data 저장)
             if delta.has_changes {
                 if let Ok(json) = serde_json::to_string(&new_streams) {
                     let _ = db.set_cache(cache_key, &json);
                 }
             }
 
-            Ok(delta)
+            // NOTE: 반환 시점에 상대 시간 계산하여 Delta Response에 주입
+            Ok(delta.with_computed_times())
         }
         Err(err) => {
             // 네트워크 에러 시 변경 없음으로 응답
