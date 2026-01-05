@@ -1,0 +1,28 @@
+{
+    "$schema": "../gen/schemas/mobile-schema.json",
+    "identifier": "localhost-capability",
+    "description": "Capability for localhost access (mobile YouTube iframe support)",
+    "windows": [
+        "main"
+    ],
+    "platforms": [
+        "android",
+        "iOS"
+    ],
+    "remote": {
+        "urls": [
+            "http://localhost",
+            "http://localhost:*"
+        ]
+    },
+    "permissions": [
+        "core:default",
+        "opener:default",
+        "notification:default",
+        "notification:allow-show",
+        "notification:allow-request-permission",
+        "http:default",
+        "store:default",
+        "dialog:default"
+    ]
+}

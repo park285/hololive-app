@@ -95,14 +95,31 @@ pub fn run() {
         let _ = dotenvy::dotenv();
     }
 
-    let builder = tauri::Builder::default()
+    // 모바일에서 YouTube iframe 지원을 위해 localhost 플러그인 사용
+    // YouTube는 tauri:// 또는 asset:// origin을 거부하므로 http://localhost가 필요함
+    #[cfg(mobile)]
+    let localhost_port = portpicker::pick_unused_port().unwrap_or(9527);
+
+    let mut builder = tauri::Builder::default();
+
+    // 모바일에서만 localhost 플러그인 등록
+    #[cfg(mobile)]
+    {
+        builder = builder.plugin(tauri_plugin_localhost::Builder::new(localhost_port).build());
+    }
+
+    let builder = builder
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_deep_link::init())
-        .setup(|app| {
+        .setup(move |app| {
+            // 모바일에서 localhost 플러그인 시작 확인
+            #[cfg(mobile)]
+            info!("Localhost plugin enabled on port {}", localhost_port);
+
             // 프로덕션 모드: 번들된 리소스에서 .env 파일 로드
             // Tauri v2에서는 resolve() 메소드로 번들 리소스 경로를 얻어야 함
             use tauri::path::BaseDirectory;

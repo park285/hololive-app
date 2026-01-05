@@ -85,7 +85,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <>
             {/* 로고 영역 */}
             <div className={cn(
-                "h-20 flex items-center shrink-0 transition-all duration-300 border-b border-border/40",
+                "h-[calc(5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] flex items-center shrink-0 transition-all duration-300 border-b border-border/40",
                 isSidebarCollapsed ? "justify-center px-0" : "justify-between px-4"
             )}>
                 <div className="flex items-center gap-3 overflow-hidden">
@@ -105,7 +105,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {!isMobile && (
                 <button
                     onClick={toggleSidebarCollapsed}
-                    className="absolute right-0 translate-x-1/2 top-24 z-50 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background shadow-sm hover:bg-accent text-muted-foreground hover:text-foreground transition-all"
+                    className="absolute right-0 translate-x-1/2 top-[calc(6rem+env(safe-area-inset-top))] z-50 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background shadow-sm hover:bg-accent text-muted-foreground hover:text-foreground transition-all"
                 >
                     {isSidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
                 </button>
@@ -242,7 +242,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {/* 사이드바 (Mobile Overlay / Desktop Static) */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-40 bg-white/80 dark:bg-card/80 backdrop-blur-xl border-r border-slate-200 dark:border-border/50 flex flex-col transition-[width,transform] duration-300 ease-in-out shadow-sm",
+                    "fixed inset-y-0 left-0 z-50 bg-white/80 dark:bg-card/80 backdrop-blur-xl border-r border-slate-200 dark:border-border/50 flex flex-col transition-[width,transform] duration-300 ease-in-out shadow-sm pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]",
                     isMobile
                         ? (isSidebarOpen ? "translate-x-0 w-[180px] rounded-r-3xl shadow-2xl border-r-0" : "-translate-x-full w-[180px] rounded-r-3xl border-r-0")
                         : (isSidebarCollapsed ? "w-[80px]" : "w-[180px]"),
@@ -265,7 +265,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {/* Overlay Background (Mobile & Tablet Expanded) */}
             {((isMobile && isSidebarOpen) || (!isMobile && !isSidebarCollapsed)) && (
                 <div
-                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden"
+                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
                     onClick={() => isMobile ? setSidebarOpen(false) : setSidebarCollapsed(true)}
                 />
             )}
@@ -277,8 +277,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
             )}>
                 {/* 헤더 - Glass 효과 (Multiview에서는 숨김) */}
                 {!isMultiview && (
-                    <header className="h-20 bg-white/60 dark:bg-background/60 backdrop-blur-md border-b border-slate-200/50 dark:border-border/50 flex items-center px-6 sm:px-8 sticky top-0 z-20">
-                        <div className="flex items-center gap-4">
+                    <header className="bg-white/60 dark:bg-background/60 backdrop-blur-md border-b border-slate-200/50 dark:border-border/50 sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+                        <div className="h-20 flex items-center px-6 sm:px-8 gap-4">
                             {isMobile && (
                                 <button
                                     onClick={() => setSidebarOpen(true)}

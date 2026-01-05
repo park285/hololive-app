@@ -109,6 +109,12 @@
     @apply border-border;
   }
 
+  html,
+  body,
+  #root {
+    @apply w-full h-full overflow-hidden;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
